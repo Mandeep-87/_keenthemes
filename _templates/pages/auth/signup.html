@@ -1,0 +1,328 @@
+{% extends layout %} {% load i18n %} {% block title %} 
+{% translate "Signup" %} {%endblock %} {% block content %}
+
+<!--begin::Form-->
+<style>
+  span.validation-message {
+  color: red;
+  font-size: 12px;
+  float: left;
+  width: 100%;
+  margin-top: 5px;
+}  
+</style>
+
+<form data-kt-redirect-url="/signin" class="form w-100" id="registrationForm">
+  {% csrf_token %}
+  <!--begin::Heading-->
+  <div class="text-center mb-11">
+    <!--begin::Title-->
+    <h1 class="text-gray-900 fw-bolder mb-3">Sign Up</h1>
+    <!--end::Title-->
+
+    <!--begin::Subtitle-->
+    <!-- <div class="text-gray-500 fw-semibold fs-6">Your Social Campaigns</div> -->
+    <!--end::Subtitle--->
+  </div>
+
+  <!--begin::Input group--->
+  <div class="fv-row mb-8">
+    <!--begin::Username-->
+    <input
+      type="text"
+      placeholder="Username"
+      name="username"
+      autocomplete="off"
+      class="form-control bg-transparent"
+    />
+    <span class="validation-message" id="usernameValidation"></span>
+  </div>
+  <div class="fv-row mb-8">
+    <!--begin::First Name-->
+    <input
+      type="text"
+      placeholder="First Name"
+      name="first_name"
+      autocomplete="off"
+      class="form-control bg-transparent"
+    />
+    <span class="validation-message" id="firstNameValidation"></span>
+    <!--end::firstname-->
+  </div>
+  <div class="fv-row mb-8">
+    <input
+      type="text"
+      placeholder="Last Name"
+      name="last_name"
+      autocomplete="off"
+      class="form-control bg-transparent"
+    />
+    <span class="validation-message" id="lastNameValidation"></span>
+    <!--end::lastname-->
+  </div>
+  <div class="fv-row mb-8">
+    <!--begin::Email-->
+    <input
+      type="email"
+      placeholder="Email"
+      name="email"
+      autocomplete="off"
+      class="form-control bg-transparent"
+    />
+    <span class="validation-message" id="emailValidation"></span>
+    <!--end::Email-->
+  </div>
+
+  <!--begin::Input group-->
+  <div class="fv-row mb-8" data-kt-password-meter="true">
+    <!--begin::Wrapper-->
+    <div class="mb-1">
+      <!--begin::Input wrapper-->
+      <div class="position-relative mb-3">
+        <input
+          class="form-control bg-transparent"
+          type="password"
+          placeholder="Password"
+          name="password"
+          autocomplete="off"
+        />
+
+        <span
+          class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
+          data-kt-password-meter-control="visibility"
+        >
+          <i class="bi bi-eye-slash fs-2"></i>
+          <i class="bi bi-eye fs-2 d-none"></i>
+        </span>
+        <span class="validation-message" id="passwordValidation"></span>
+      </div>
+      <!--end::Input wrapper-->
+
+      <!--begin::Meter-->
+      <div
+        class="d-flex align-items-center mb-3"
+        data-kt-password-meter-control="highlight"
+      >
+        <div
+          class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"
+        ></div>
+        <div
+          class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"
+        ></div>
+        <div
+          class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"
+        ></div>
+        <div
+          class="flex-grow-1 bg-secondary bg-active-success rounded h-5px"
+        ></div>
+      </div>
+      <!--end::Meter-->
+    </div>
+    <!--end::Wrapper-->
+
+    <!--begin::Hint-->
+    <div class="text-muted">
+      Use 8 or more characters with a mix of letters, numbers & symbols.
+    </div>
+    <!--end::Hint-->
+  </div>
+  <!--end::Input group--->
+
+  <!--end::Input group--->
+  <div class="fv-row mb-8">
+    <!--begin::Repeat Password-->
+    <input
+      type="text"
+      placeholder="Repeat Password"
+      name="confirm-password"
+      type="password"
+      autocomplete="off"
+      class="form-control bg-transparent"
+    />
+    <span class="validation-message" id="confirmPasswordValidation"></span>
+    <!--end::Repeat Password-->
+  </div>
+  <!--end::Input group--->
+  <div class="fv-row mb-10">
+    <label
+      class="form-check form-check-custom form-check-solid form-check-inline"
+    >
+      <input class="form-check-input" type="checkbox" name="toc" value="1" />
+      <span class="form-check-label fw-semibold text-gray-700 fs-6"
+        >I Agree <a href="#" class="ms-1 link-primary">Terms and conditions</a>.
+      </span>
+    </label>
+    <span class="validation-message" id="tocValidation"></span>
+  </div>
+  <!--begin::Submit button-->
+  <div class="d-grid mb-10">
+    <div class="text-center">
+      <button type="button" id="submitBtn" class="btn btn-lg btn-primary">
+        <span class="indicator-label">Submit</span>
+        <span class="indicator-progress"
+          >Please wait...
+          <span
+            class="spinner-border spinner-border-sm align-middle ms-2"
+          ></span>
+        </span>
+      </button>
+    </div>
+  </div>
+  <!--end::Submit button-->
+
+  <!--begin::Sign up-->
+  <div class="text-gray-500 text-center fw-semibold fs-6">
+    Already have an Account?
+
+    <a href="/signin" class="link-primary fw-semibold"> Sign in </a>
+  </div>
+  <!--end::Sign up-->
+</form>
+
+<!--end::Form-->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#submitBtn").click(function () {
+      // Clear previous validation messages
+      $(".validation-message").text("");
+      // Perform client-side validation
+      var username = $("input[name='username']").val();
+      var firstName = $("input[name='first_name']").val();
+      var lastName = $("input[name='last_name']").val();
+      var email = $("input[name='email']").val();
+      var password = $("input[name='password']").val();
+      var confirmPassword = $("input[name='confirm-password']").val();
+      var toc = $("input[name='toc']").prop("checked");
+      var errors = [];
+
+      if (!username) {
+        errors.push("Username is required");
+        $("#usernameValidation").text("Username is required");
+      }
+
+      if (!firstName) {
+        errors.push("First Name is required");
+        $("#firstNameValidation").text("First Name is required");
+      }
+
+      if (!lastName) {
+        errors.push("Last Name is required");
+        $("#lastNameValidation").text("Last Name is required");
+      }
+
+      if (!email) {
+        errors.push("Email is required");
+        $("#emailValidation").text("Email is required");
+      }
+
+      if (!password) {
+        errors.push("Password is required");
+        $("#passwordValidation").text("Password is required");
+      }
+
+      if (!password.length > 7) {
+        errors.push("Password should  be more than 8 characters");
+        $("#passwordValidation").text(
+          "Password should not be more than 8 characters"
+        );
+      }
+
+      if (password !== confirmPassword) {
+        errors.push("Passwords do not match");
+        $("#confirmPasswordValidation").text("Passwords do not match");
+      }
+
+      if (!toc) {
+        errors.push("You must agree to the terms and conditions");
+        $("#tocValidation").text("You must agree to the terms and conditions");
+      }
+
+      // Display all errors together
+      if (errors.length > 0) {
+        // Show a SweetAlert error popup with OK button
+        var errorList = $("<ul>");
+
+        errors.forEach(function (error) {
+          errorList.append($("<li>").text(error));
+        });
+        Swal.fire({
+          icon: "error",
+          title:
+            "Sorry,looks like there are some errors detected, please try again!",
+          showConfirmButton: true,
+          confirmButtonText: "OK,got it!",
+        });
+        return; // Stop form submission if there are errors
+      }
+
+      // Get form data
+      var formData = $("#registrationForm").serialize();
+
+      // Ajax request
+      $.ajax({
+        type: "POST",
+        url: "{% url 'auth:signup' %}", // Replace with your server endpoint
+        data: formData,
+        success: function (response) {
+          // Check if the API response is true
+          if (response.icon === true) {
+            // Use strict comparison (===) to check for true
+            // Show a SweetAlert success popup
+            Swal.fire({
+              icon: "error",
+              title: response.message,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            Swal.fire({
+              icon: "success",
+              title: "Signup successful. You can now login.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            // Optionally, you can redirect the user or perform other actions
+            setTimeout(() => {
+              console.log("Redirecting to sign-in page");
+              window.location.href = "{% url 'auth:signin' %}"; // Replace with the actual URL of your sign-in page
+            }, 1500);
+            // Show a SweetAlert error popup
+          }
+        },
+      });
+    });
+
+    // Add event listeners to clear validation messages on input
+    $("input[name='username']").on("input", function () {
+      $("#usernameValidation").text("");
+    });
+
+    $("input[name='first_name']").on("input", function () {
+      $("#firstNameValidation").text("");
+    });
+
+    $("input[name='last_name']").on("input", function () {
+      $("#lastNameValidation").text("");
+    });
+
+    $("input[name='email']").on("input", function () {
+      $("#emailValidation").text("");
+    });
+
+    $("input[name='password']").on("input", function () {
+      $("#passwordValidation").text("");
+    });
+
+    $("input[name='confirm-password']").on("input", function () {
+      $("#confirmPasswordValidation").text("");
+    });
+
+    $("input[name='toc']").on("input", function () {
+      $("#tocValidation").text("");
+    });
+  });
+</script>
+
+{% endblock %}
