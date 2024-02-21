@@ -1,7 +1,8 @@
 # backend\patent_analysis.py
 
 import json
-import openai
+
+
 import logging
 import os
 from datetime import datetime
@@ -10,10 +11,14 @@ from fuzzywuzzy import fuzz
 from collections import defaultdict
 import requests
 from .models import IpcModelSymbol
-# from openai import OpenAI
+from openai import OpenAI
 
-openai.api_key = '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'
 
+
+import os
+
+OPEN_API_KEY = os.getenv('OPEN_API_KEY')
+client = OpenAI(api_key=OPEN_API_KEY)
 # Load SpaCy's NLP model
 nlp = spacy.load("en_core_web_sm")
 
@@ -36,7 +41,7 @@ class OpenAIService:
         logging.info(f"Sending prompt to OpenAI: {prompt}")
         
         try:
-            response = openai.Completion.create(engine=engine, prompt=prompt, max_tokens=200)
+            response = client.completions.create(engine=engine, prompt=prompt, max_tokens=200)
             scopes = response.choices[0].text.strip().split('\n')
             scopes = [scope for scope in scopes if len(scope) > 10]
             logging.info(f"Received patentable scopes from OpenAI: {scopes}")

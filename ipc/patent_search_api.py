@@ -11,10 +11,12 @@ from collections import defaultdict
 import requests
 from bs4 import BeautifulSoup
 from .models import IpcModelSymbol
-# from openai import OpenAI
+from openai import OpenAI
 
-# openai.api_key = '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'
-openai.api_key = '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'
+import os
+
+OPEN_API_KEY = os.getenv('OPEN_API_KEY')
+client = OpenAI(api_key=OPEN_API_KEY)
 
 
 
@@ -32,7 +34,7 @@ class OpenAIService:
         logging.info(f"Sending prompt to OpenAI: {prompt}")
         
         try:
-            response = openai.Completion.create(engine=engine, prompt=prompt, max_tokens=200,temperature=creativity)
+            response = client.completions.create(model=engine, prompt=prompt, max_tokens=200,temperature=creativity)
             scopes = response.choices[0].text.strip().split('\n')
             scopes = [scope for scope in scopes if len(scope) > 10]
             logging.info(f"Received patentable scopes from OpenAI: {scopes}")

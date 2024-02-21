@@ -2,10 +2,17 @@ from langchain.chains import AnalyzeDocumentChain
 from langchain.chains.summarize import load_summarize_chain
 from langchain.llms import OpenAI
 from PyPDF2 import PdfReader
-import openai
+from openai import OpenAI
+
+
 import requests
 from .models import IpcModelSymbol
 from bs4 import BeautifulSoup
+
+import os
+
+OPEN_API_KEY = os.getenv('OPEN_API_KEY')
+client = OpenAI(api_key=OPEN_API_KEY)
 # from langchain_community.llms import OpenAI
 
 # This function is reading PDF from the start page to final page
@@ -37,7 +44,6 @@ def summarize_data(data):
 class OpenAIError(Exception):
     pass
 # openai.api_key = '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'
-openai.api_key = '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'
 class OpenAIService:
     @staticmethod
     def get_patent_ideas(data, engine="gpt-3.5-turbo-instruct"):
@@ -45,7 +51,7 @@ class OpenAIService:
       
         
         try:
-            response = openai.Completion.create(engine=engine, prompt=prompt, max_tokens=200)
+            response = client.completions.create(engine=engine, prompt=prompt, max_tokens=200)
             scopes = response.choices[0].text.strip().split('\n')
             scopes = [scope for scope in scopes if len(scope) > 10]
             

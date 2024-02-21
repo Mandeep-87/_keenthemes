@@ -12,7 +12,13 @@ import fitz  # PyMuPDF
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
 
-os.environ['open_api_key'] = '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'
+
+
+import os
+
+OPEN_API_KEY = os.getenv('OPEN_API_KEY')
+client = OpenAI(api_key=OPEN_API_KEY)
+# os.environ['open_api_key'] = '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'
 
 
 # document_path = '/home/studio/Documents/py projects/starterkit/ipc/US10212857.pdf'
@@ -35,7 +41,7 @@ def questioning_pdf_for_data(document_path):
 
     doc.close()
 
-    # If the raw_text is empty, it might be an image-based PDF
+  
     if not raw_text:
         # Use PyPDF2 to extract text from image-based PDF
         pdfreader = PdfReader(document_path)
@@ -50,17 +56,13 @@ def questioning_pdf_for_data(document_path):
 
     text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1800, chunk_overlap=200, length_function=len)
     texts = text_splitter.split_text(raw_text)
-    # print(texts, '=====texts')
-    OPENAI_API_KEY = os.environ.get('open_api_key')
-    if not OPENAI_API_KEY:
-        raise ValueError("OpenAI API key is not set in the environment variable 'open_api_key'.")
-    # print(OPENAI_API_KEY, '=-=-=-=-=-=-=')
-    embeddings = OpenAIEmbeddings(openai_api_key=os.environ['open_api_key'])
+ 
+    embeddings = OpenAIEmbeddings(openai_api_key=OPEN_API_KEY)
     print(embeddings,'p-p-p-p-p-p-p-embeddingsssss')
 
     document_search = FAISS.from_texts(texts, embeddings)
     # print(document_search,'------document_search-----')
-    chain = load_qa_chain(OpenAI(openai_api_key=OPENAI_API_KEY), chain_type='stuff')
+    chain = load_qa_chain(OpenAI(openai_api_key=OPEN_API_KEY), chain_type='stuff')
     # query = "who is Inventor in this pdf?"
     queries = ["who is the Inventor in this pdf?", "what will be the main topic of this pdf written in bold letters?",
                "what is the Executive Summary in this patent pdf in 5-6 lines?","What is the publication date in this pdf?","what is the Abstract in this pdf","what is the field of invention in this pdf?, what is the Application date or Publication date in this pdf?"]

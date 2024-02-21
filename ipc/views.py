@@ -329,6 +329,8 @@ class pdf_file_upload_with_imagesview(LoginRequiredMixin,TemplateView):
                 compliance_requirements=OpenAIServiceForPdf.compliance_requirements(data_from_pdf['field_of_invention'])
                 abstract = OpenAIServiceForPdf.abstract(data_from_pdf['field_of_invention'])
                 reference = OpenAIServiceForPdf.reference(data_from_pdf['field_of_invention'])
+                graphs = OpenAIServiceForPdf.interactive_graphs(data_from_pdf['field_of_invention'])
+                print(graphs)
 
 
                 formatted_data_json = []
@@ -373,7 +375,8 @@ class pdf_file_upload_with_imagesview(LoginRequiredMixin,TemplateView):
                     'regulatory_landscape':regulatory_landscape,
                     'compliance_requirements':compliance_requirements,
                     'Abstract':abstract,
-                    'reference_and_links':reference
+                    'reference_and_links':reference,
+                    'graphs':graphs
                 }
 
                 return JsonResponse({'success': True, 'context': context})

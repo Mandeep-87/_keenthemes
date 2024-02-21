@@ -2,6 +2,14 @@ import fitz
 import base64
 from .models import IpcModelSymbol
 from bs4 import BeautifulSoup
+from openai import OpenAIError
+from openai import OpenAI
+
+
+import os
+
+OPEN_API_KEY = os.getenv('OPEN_API_KEY')
+client = OpenAI(api_key=OPEN_API_KEY)
 
 def save_all_pages_as_png(pdf_path: str, output_folder: str):
     pdf_document = fitz.open(pdf_path)
@@ -63,7 +71,7 @@ def encode_image(image_path: str):
 import requests
 import json
 
-api_key = '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'
+api_key = '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'
 
 def call_gpt4_with_image(new_data):
     headers = {
@@ -104,8 +112,10 @@ def call_gpt4_with_image(new_data):
 # print(data,'[[[[[[[]]]]]]]')
 
 
-import openai
-openai.api_key = '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'
+
+# openai.api_key = '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'
+
+
 class OpenAIService:
     @staticmethod
     def get_patent_ideas(data, engine="gpt-3.5-turbo-instruct"):
@@ -113,7 +123,7 @@ class OpenAIService:
       
         
         try:
-            response = openai.Completion.create(engine=engine, prompt=prompt, max_tokens=150)
+            response = client.completions.create(model=engine, prompt=prompt, max_tokens=150)
             scopes = response.choices[0].text.strip().split('\n')
             scopes = [scope for scope in scopes if len(scope) > 10]
             
